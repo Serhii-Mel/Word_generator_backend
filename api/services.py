@@ -11,7 +11,22 @@ import re
 
 load_dotenv()
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Get API key with better error handling
+api_key = os.getenv("ANTHROPIC_API_KEY")
+if not api_key:
+    logger.error("ANTHROPIC_API_KEY environment variable is not set")
+    raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
+
+try:
+    client = anthropic.Anthropic(api_key=api_key)
+    logger.info("Successfully initialized Anthropic client")
+except Exception as e:
+    logger.error(f"Failed to initialize Anthropic client: {str(e)}")
+    raise ValueError(f"Failed to initialize Anthropic client: {str(e)}")
 
 # Model output limit (safe for Claude 3 Haiku)
 MAX_WORDS_PER_REQUEST = 3500  # Adjust as needed for your model

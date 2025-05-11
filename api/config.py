@@ -11,7 +11,7 @@ DEBUG = True
 
 # CORS Settings
 CORS_ORIGINS = [
-    "https://word-generator-frontend.vercel.app/"
+    "https://word-generator-frontend.vercel.app"
 ]
 
 # Anthropic API Settings

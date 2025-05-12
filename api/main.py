@@ -31,9 +31,9 @@ async def root():
 async def generate_script(request: ScriptRequest):
     result = await anthropic_service.generate_script(
         request.title,
-        request.inspirational_transcript,
         request.word_count,
         request.forbidden_words,
+        request.inspirational_transcript,
         request.structure_prompt
     )
     # If not enough words, continue the story

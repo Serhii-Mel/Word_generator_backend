@@ -127,7 +127,7 @@ Continue the story from the following context:
             raise HTTPException(status_code=500, detail=f"Script continuation failed: {str(e)}")
 
 
-    async def generate_script(self, title: str, transcript: str, word_count: int, forbidden_words: list[str], structure_prompt: str = ""):
+    async def generate_script(self, title: str, word_count: int, forbidden_words: list[str], transcript: str = None, structure_prompt: str = ""):
         try:
             forbidden_words_str = ", ".join(forbidden_words) if isinstance(forbidden_words, list) else str(forbidden_words)
             num_parts = math.ceil(word_count / MAX_WORDS_PER_REQUEST)
@@ -148,12 +148,12 @@ Continue the story from the following context:
                 elif part_start >= 6000:
                     cta = get_paraphrased_cta(CTA_6000)
                 prompt = f"""
-You are a professional, versatile scriptwriter for YouTube videos. Your task is to write a compelling, original script inspired by the following transcript, but with new names, details, and environment, and based on the new video title.
+You are a professional, versatile scriptwriter for YouTube videos. Your task is to write a compelling, original script based on the new video title.
 
 Title: {title}
 Target Word Count for this part: {part_word_count}
 Forbidden Words: {forbidden_words_str if forbidden_words else 'None'}
-Inspirational Transcript: {transcript}
+{f'Inspirational Transcript: {transcript}' if transcript else ''}
 
 {f'Follow this structure: {structure_prompt}' if structure_prompt else ''}
 
@@ -165,7 +165,7 @@ Continue the story from the following context (if any):
 **Script Requirements:**
 - The script MUST be as close as possible to {part_word_count} words for this part. Do NOT generate fewer words. Do NOT exceed the word count by more than 5%.
 - The script should be divided into paragraphs, each as a string in a JSON array.
-- The script should be original, not copying the transcript, but using it for pacing, style, and structure.
+- The script should be original and creative, using the title as inspiration.
 - The script should be suitable for narration and keep viewers engaged.
 - Do NOT include any text before or after the JSON array. Return ONLY a valid JSON array of strings, where each string is a paragraph.
 
@@ -218,9 +218,9 @@ Continue the story from the following context (if any):
         context_after: str,
         segment_word_count: int,
         title: str,
-        inspirational_transcript: str,
-        forbidden_words: list[str],
-        structure_prompt: str
+        inspirational_transcript: str = None,
+        forbidden_words: list[str] = None,
+        structure_prompt: str = ""
     ) -> dict:
         """Regenerate a segment of the script."""
         prompt = f"""You are a professional scriptwriter. Your task is to regenerate a segment of a video script.
@@ -237,6 +237,8 @@ Please generate a new segment that:
 3. Follows the same style and tone as the rest of the script
 4. Creates smooth transitions with the paragraphs before and after
 5. Is optimized for spoken delivery
+
+{f'Inspirational Transcript: {inspirational_transcript}' if inspirational_transcript else ''}
 
 Return ONLY a valid JSON object with two fields:
 1. "content": The regenerated segment text

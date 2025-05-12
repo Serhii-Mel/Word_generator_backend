@@ -52,7 +52,15 @@ async def generate_script(request: ScriptRequest):
 @app.post("/regenerate-segment")
 async def regenerate_segment(request: dict):
     try:
-        print(0)
+        # Log the incoming request for debugging
+        print("Received regenerate segment request:", request)
+        
+        # Validate required fields
+        required_fields = ["title", "context_before", "context_after", "segment_word_count"]
+        missing_fields = [field for field in required_fields if field not in request]
+        if missing_fields:
+            raise HTTPException(status_code=400, detail=f"Missing required fields: {', '.join(missing_fields)}")
+
         result = anthropic_service.regenerate_segment(
             title=request.get("title"),
             inspirational_transcript=request.get("inspirational_transcript"),
@@ -62,10 +70,14 @@ async def regenerate_segment(request: dict):
             context_after=request.get("context_after", ""),
             segment_word_count=request.get("segment_word_count", 500)
         )
-        print(result)
+        
+        # Log the result for debugging
+        print("Regenerate segment result:", result)
+        
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        print("Error in regenerate_segment:", str(e))  # Add logging
         raise HTTPException(status_code=500, detail=str(e))
 

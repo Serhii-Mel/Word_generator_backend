@@ -3,7 +3,7 @@ from typing import List, Optional
 
 class ScriptRequest(BaseModel):
     title: str
-    inspirational_transcript: str
+    inspirational_transcript: Optional[str] = None
     word_count: int
     forbidden_words: List[str] = []
     structure_prompt: str = ''
